@@ -1,0 +1,61 @@
+version: '3.7'
+
+services:
+ 
+  node:
+    build:
+      context: ./services/node
+      dockerfile: Dockerfile-dev
+    restart: always
+    volumes:
+      - './services/node:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3001:3001
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - redis
+
+  redis:
+    image: bitnami/redis:latest
+    ports:
+      - 6379:6379
+    environment: 
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./redis:/bitnami/redis/data
+    restart: always
+    container_name: redis_dos
+    
+  client:
+    build:
+      context: ./services/client
+      dockerfile: Dockerfile-dev
+    volumes:
+      - './services/client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_API_URL=${REACT_APP_API_URL}
+    depends_on:
+      - node
+
+  nginx:
+    build:
+      context: ./services/nginx
+      dockerfile: Dockerfile-dev
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - node
+      - client
+
+volumes:
+  data:
+    driver: "local"
