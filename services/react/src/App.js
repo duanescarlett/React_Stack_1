@@ -13,12 +13,13 @@ class App extends Component {
 
   componentDidMount () {
     axios.get('/api/users')
-      .then((response) => {
-        console.log(response.data);
-        this.setState({ users: response.data });
-      })
-      .catch(err => console.log(err));
+    .then((response) => {
+      console.log(response.data);
+      this.setState({ users: response.data });
+    })
+    .catch(err => console.log(err));
   }
+  
   render() {
     return (
       <div className="App">
