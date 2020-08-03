@@ -2,13 +2,13 @@ version: '3.7'
 
 services:
  
-  node:
+  express:
     build:
-      context: ./services/node
+      context: ./services/express
       dockerfile: Dockerfile-dev
     restart: always
     volumes:
-      - './services/node:/usr/src/app'
+      - './services/express:/usr/src/app'
       - '/usr/src/app/node_modules'
     ports:
       - 3001:3001
@@ -29,12 +29,12 @@ services:
     restart: always
     container_name: redis_dos
     
-  client:
+  react:
     build:
-      context: ./services/client
+      context: ./services/react
       dockerfile: Dockerfile-dev
     volumes:
-      - './services/client:/usr/src/app'
+      - './services/react:/usr/src/app'
       - '/usr/src/app/node_modules'
     ports:
       - 3000:3000
@@ -43,7 +43,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - REACT_APP_API_URL=${REACT_APP_API_URL}
     depends_on:
-      - node
+      - express
 
   nginx:
     build:
@@ -53,8 +53,8 @@ services:
     ports:
       - 80:80
     depends_on:
-      - node
-      - client
+      - express
+      - react
 
 volumes:
   data:
